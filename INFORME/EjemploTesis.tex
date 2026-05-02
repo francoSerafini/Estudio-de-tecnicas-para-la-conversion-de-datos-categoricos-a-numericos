@@ -1,0 +1,272 @@
+\documentclass[a4paper,10pt]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{ragged2e}
+%\usepackage{mathtools}makeglossaries %.tex
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage[spanish, es-tabla]{babel}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage{incgraph,tikz}
+%\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsfonts}
+%\usepackage{babel}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{adjustbox}
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{titlepic}
+\usepackage{amsmath}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{etoolbox}
+%\usepackage{cite}    
+\usepackage{bm}
+\usepackage{makecell}
+\usepackage{placeins}
+
+
+
+\usepackage{listings}
+\lstset{ %
+basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+numbers=none,                   % where to put the line-numbers
+numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=10pt,                  % how far the line-numbers are from the code
+backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=4,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
+
+
+
+\usetikzlibrary{arrows}
+
+\captionsetup[subfigure]{subrefformat=simple,labelformat=simple}
+
+\renewcommand{\contentsname}{\'Indice General}
+\renewcommand{\listfigurename}{\'Indice de Figuras}
+\renewcommand{\listtablename}{\'Indice de Tablas}
+\renewcommand{\lstlistingname}{Salida}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\figurename}{Figura}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+\renewcommand{\baselinestretch}{1.2} 
+
+\makeatletter
+\def\verbatim{\small\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+\makeatother
+
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+
+\fancyhead[LE]{\nouppercase{\leftmark}}
+\fancyhead[RO]{\nouppercase{\leftmark}}
+
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+
+
+
+%\restylefloat{table}
+
+
+\definecolor{TPcolor}{HTML}{A9D18E} % Verde claro para TP
+\definecolor{TNcolor}{HTML}{D9EAD3} % Verde muy claro para TN
+\definecolor{FPcolor}{HTML}{F4CCCC} % Rojo muy claro para FP
+\definecolor{FNcolor}{HTML}{E06666} % Rojo claro para FN
+
+\title{Estudio de Técnicas para la Conversión de Datos Categóricos a Numéricos}
+\author{Autor: Franco Serafini  \\ Tutora: Dra. Andrea Rey}
+\date{Universidad Nacional de Hurlingham (UNAHUR)}
+\titlepic{\vspace{12cm}\includegraphics[width=0.15\textwidth]{logo.jpg}}
+
+\usepackage{titlesec}
+
+% Chapters justificados
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\justifying} % estilo del capítulo
+{\chaptername\ \thechapter}{20pt}{\Huge}
+
+% Sections justificados
+\titleformat{\section}
+{\normalfont\Large\bfseries\justifying} % estilo de la sección
+{\thesection}{1em}{}
+
+% Subsections justificados
+\titleformat{\subsection}
+{\normalfont\large\bfseries\justifying}
+{\thesubsection}{1em}{}
+
+
+
+
+
+
+
+\begin{document}
+
+
+\maketitle
+
+
+	\tableofcontents
+	
+	\addcontentsline{toc}{chapter}{Índice de Figures}
+	\renewcommand{\listfigurename}{Índice de Figuras}
+	\listoffigures
+	
+	\addcontentsline{toc}{chapter}{Índice de Tablas}
+    \renewcommand{\listtablename}{Índice de Tablas}
+	\listoftables
+
+
+
+\chapter*{Resumen}
+
+\noindent
+
+
+
+\chapter{Introducción}
+
+
+
+\section{Motivación}
+
+\section{Estado del Arte}
+ 
+\section{Conjuntos de Datos}
+	
+	En esta sección se detalla la naturaleza, el origen y la composicion del conjunto de datos utilizado para el presente estudio.
+	
+	\subsection{Ficha técnica}
+		
+			El conjunto de datos seleccionados es el \textit{'Adult Income Dataset'}, obtenido del repositorio publico Kaggle \footnote{Disponible en: \url{https://www.kaggle.com/datasets/wenruliu/adult-income-dataset}}. Este \textit{dataset} es una extracción de datos históricos reales provenientes del censo de los Estados Unidos de 1994.
+			
+			Este estudio aborda un problema de \textbf{clasificación binaria supervisada}: predecir si los ingresos anuales de una persona superan los \$50.000 dólares. A continuación, se presenta la Tabla \ref{tab:ficha_tecnica} con las especificaciones generales:
+			
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{|l|l|}
+					\hline
+					\rowcolor{TPcolor} 
+					\textbf{Categoría} & \textbf{Detalle} \\ \hline
+					\textbf{Fuente} & Censo de EE. UU. (1994) \\ \hline
+					\textbf{Instancias (Registros)} & 48,842 \\ \hline
+					\textbf{Atributos Originales} & 15 (14 predictores + 1 objetivo) \\ \hline
+					\textbf{Tipo de Datos} & Mixtos (Numéricos y Categóricos) \\ \hline
+					\textbf{Tipo de Problema} & Clasificación Binaria Supervisada \\ \hline
+					\textbf{Variable Objetivo} & Ingresos anuales (\textit{Income}) \\ \hline
+					\textbf{Valores de Clase} & $\le 50.000$ USD ($0$) / $> 50.000$ USD ($1$) \\ \hline
+				\end{tabular}
+				\caption{Ficha técnica del Adult Income Dataset.}
+				\label{tab:ficha_tecnica}
+			\end{table}
+			
+	\subsection{Descripción de las Características}
+	
+		El \textit{dataset} consta con 14 atributos predictivos que capturan información demográfica y laboral. En la Tabla \ref{tab:atributos} se presenta el diccionario de datos detallados:
+		
+	\begin{table}[H]
+		\centering
+		\begin{adjustbox}{width=\textwidth}
+			\begin{tabular}{@{}llll@{}}
+				\toprule
+				\textbf{Atributo} & \textbf{Tipo de Dato} & \textbf{Descripción} & \textbf{Dominio / Cardinalidad} \\ \midrule
+				Age & Numérico (Int) & Edad de los individuos. & Rango: 17 a 90 años. \\
+				Workclass & Categórico & Sector de empleo. & 9 categorías. \\
+				Fnlwgt & Numérico (Int) & Peso muestral de la población. & Rango: 12,285 a 1,490,400. \\
+				Education & Categórico & Nivel de estudios alcanzado. & 16 categorías. \\
+				Educational-num & Numérico (Int) & Nivel educativo escalar. & Rango: 1 a 16. \\
+				Marital-status & Categórico & Estado civil. & 7 categorías. \\
+				Occupation & Categórico & Especialidad laboral. & 15 categorías. \\
+				Relationship & Categórico & Rol dentro del núcleo familiar. & 6 categorías. \\
+				Race & Categórico & Origen étnico. & 5 categorías. \\
+				Gender & Categórico & Género biológico. & 2 categorías. \\
+				Capital-gain & Numérico (Int) & Utilidades financieras. & Rango: 0 a 99,999. \\
+				Capital-loss & Numérico (Int) & Pérdidas financieras. & Rango: 0 a 4,356. \\
+				Hours-per-week & Numérico (Int) & Carga horaria semanal. & Rango: 1 a 99 horas. \\
+				Native-country & Categórico & País de procedencia. & 42 categorías. \\
+				\rowcolor{TNcolor}
+				\textbf{Income (Target)} & \textbf{Categórico} & \textbf{Variable objetivo.} & \textbf{2 niveles (0 y 1).} \\ \bottomrule
+			\end{tabular}
+		\end{adjustbox}
+		\caption{Diccionario de datos: tipos, descripciones y análisis de dominios.}
+		\label{tab:atributos}
+	\end{table}
+	
+	\subsection{Análisis de Calidad y Limpieza de Datos}
+		
+		Previo a la aplicación de las técnicas de \textit{encoding}, se procede a realizar la limpieza de los datos. El \textit{Adult Income Dataset} contiene ruidos e inconsistencias (valores '?' y duplicados) que deben tratarse.
+		
+		\subsection{Identificación y Cuantificación de los Valores faltantes}
+			
+			Durante la exploración inicial, se identifico que el conjunto de datos emplea el carácter especial \texttt{'?'} para representar información desconocida. Mediante un análisis de frecuencias, se determino que el impacto de estos valores se concentra exclusivamente en tres variables categóricas, como se detalla en la Tabla \ref{tab:nulos}:
+			
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{|l|c|c|c|}
+					\hline
+					\rowcolor{FPcolor} 
+					\textbf{Atributo} & \textbf{Cantidad de '?'} & \textbf{Porcentaje} & \textbf{Moda (Valor para imputación)} \\ \hline
+					Workclass & 2,799 & 5.73\% & Private \\ \hline
+					Occupation & 2,809 & 5.75\% & Prof-specialty \\ \hline
+					Native-country & 857 & 1.75\% & United-States \\ \hline
+				\end{tabular}
+				\caption{Distribución de valores faltantes y estrategia de imputación.}
+				\label{tab:nulos}
+			\end{table}
+			
+		\subsection{Estrategias de Depuración Implementadas}
+			
+			Para garantizar la integridad de los datos, se realizaron las siguientes acciones de depuración e imputación:
+			
+			\begin{enumerate}
+				\item  \textbf{Imputación por Moda:} En lugar de descartar registros, se opto por sustituir el caracter \texttt{'?'} por el valor mas frecuente de cada columna. Gracias a esto preservamos el tamaño de la muestra original.
+				\item \textbf{Eliminación de Registros Duplicados:} Se detectaron y eliminaron \textbf{52 registros duplicados}, resultado en un \textit{dataset} final de \textbf{48.789 registros}.
+				\item \textbf{Consolidación del Dataset:} Tras el procesamiento, se realizo un reajuste del indice y se verifico la consistencia de los tipos de datos: variables numéricas (\textit{int64}) y categóricas (\textit{str}). Los datos limpios se exportaron al archivo  \texttt{adult\_limpio.csv} para asegurar que todos los experimentos de \textit{encoding} partan de la misma base de información.
+			\end{enumerate}
+			
+					
+		
+
+
+
+
+\chapter{Metodología}
+\label{Sec:Métodos}
+
+
+\chapter{Resultados y discusión}
+\label{ch:resultados}
+
+
+\chapter{Conclusiones}
+
+\bibliographystyle{plain}
+\bibliography{Referencias}
+\addcontentsline{toc}{chapter}{Bibliografía}
+
+\end{document}
