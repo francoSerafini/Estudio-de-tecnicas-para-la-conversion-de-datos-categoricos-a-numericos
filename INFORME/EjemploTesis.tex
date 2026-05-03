@@ -268,38 +268,65 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 		\subsubsection{Consolidación del Dataset} 
 			Tras el procesamiento, se realizo un reajuste del indice y se verifico la consistencia de los tipos de datos: variables numéricas (\textit{int64}) y categóricas (\textit{str}). Los datos limpios se exportaron al archivo  \texttt{adult\_limpio.csv} para asegurar que todos los experimentos de \textit{encoding} partan de la misma base de información.
 		
-		\subsection{El desafió de la naturaleza de los datos y el riesgo del sesgo}
-			Una solución trivial seria el \textit{Label Encoding}, que asigna un numero entero arbitrario a cada categoría. No obstante, para atributos nominales como \textit{occupation} o \textit{native-country}, esta técnica introduce un \textbf{sesgo de orden natural inexistente}.
-			Si se utilizara una codificación entera simple, un modelo de ML (especialmente aquellos basados en distancias o pesos) interpretaría erróneamente que una categoria con valor 3 es "superior" o "mas distante" a una con valor 1. Este orden artificial distorsiona la realidad de los datos nominales y puede degradar significativamente la precisión de los modelos.
+	
+	\chapter{Metodología de Codificación Categórica}
+	\label{ch:metodologia}
+		
+		En este capitulo se describen las técnicas de transformación de datos implementadas para convertir las variables cualitativas del \textit{Adult Income Dataset} en representaciones numéricas. Este proceso es fundamental para permitir la comparación de rendimiento entre diversos algoritmos de Aprendizaje Automático. 
+		
+		\section{Necesidad del Preprocesamiento de Datos Categóricos}
 			
-		\subsection{Algoritmos con soporte categórico nativo vs Transformación}
-			Es importante destacar que existen algoritmos basados en arboles de decision (como \textit{Random Forest}) o \textit{XGBoost}) que pueden manejar atributos categoricos mediante logicas en sus nodos. Sin embargo, para realizar un estudio comparativo, o para utilizar arquitecturas de DL, se debe realizar una estandarizacion mediante tecnicas de \textit{encoding}.
-	
-		
-		
-	
-		
-	
+			El éxito de los modelos de \textit{Machine Learning} (ML) y \textit{Deep Learning} (DL) reside en su capacidad para identificar patrones mediante herramientas estadísticas y matemáticas.
 			
-					
-		
+			\subsection{El concepto de representación numérica en modelos matemáticos}
+			
+				La mayoría de los algoritmos de Aprendizaje Automático, incluyendo las Redes Neuronales, la Regresión Logística y las Maquinas de Soporte Vectorial (SVM), son funciones matemáticas que operan exclusivamente sobre \textbf{tensores numéricos}. En estas estructuras, cada atributo de entrada debe ser una magnitud escalar que permita realizar operaciones de álgebra lineal, como el calculo de productos punto, o de calculo diferencial, como la actualización de pesos mediante la gradiente descendente.
+				En este contexto, las etiquetas de texto como \texttt{'Private'} (perteneciente a la variable \textit{workclass}) o \texttt{'China'} (de \textit{native-country}) carecen de valor operativo directo para los cálculos internos del algoritmo. Por lo tanto, se debe establecer una función de transformación $\phi: \mathcal{C} \rightarrow \mathbb{R}^n$ que proyecte el espacio de categorías cualitativas en un espacio vectorial numérico. Esta representación vectorial permite que tanto los modelos de Aprendizaje Automático como los de Aprendizaje Profundo puedan procesar y extraer patrones de la información demográfica y laboral del censo.
 
-
-
-
-\chapter{Metodología de Codificación Categórica}
-\label{ch:metodologia}
+	\subsection{El desafió de la naturaleza de los datos y el riesgo del sesgo}
 	
-	En este capitulo se describen las técnicas de transformación de datos implementadas para convertir las variables cualitativas del \textit{Adult Income Dataset} en representaciones numéricas. Este proceso es fundamental para permitir la comparación de rendimiento entre diversos algoritmos de Aprendizaje Automático. 
+		Una solución trivial seria el \textit{Label Encoding}, que asigna un numero entero arbitrario a cada categoría. No obstante, para atributos nominales como \textit{occupation} o \textit{native-country}, esta técnica introduce un \textbf{sesgo de orden natural inexistente}.
+		Si se utilizara una codificación entera simple, un modelo de ML (especialmente aquellos basados en distancias o pesos) interpretaría erróneamente que una categoría con valor 3 es "superior" o "mas distante" a una con valor 1. Este orden artificial distorsiona la realidad de los datos nominales y puede degradar significativamente la precisión de los modelos.
 	
-	\section{Necesidad del Preprocesamiento de Datos Categóricos}
+	\subsection{Algoritmos con soporte categórico nativo vs Transformación}
+	
+		Es importante destacar que existen algoritmos basados en arboles de decisión (como \textit{Random Forest}) o \textit{XGBoost}) que pueden manejar atributos categóricos mediante lógicas en sus nodos. Sin embargo, para realizar un estudio comparativo, o para utilizar arquitecturas de DL, se debe realizar una estandarización mediante técnicas de \textit{encoding}.
+		Este trabajo explora tres enfoques distintos para resolver este desafio: \textit{One-Hot Encoding}, \textit{Count Encoding} y \textit{Hashing Encoding}.
 		
-		El éxito de los modelos de \textit{Machine Learning} (ML) y \textit{Deep Learning} (DL) reside en su capacidad para identificar patrones mediante herramientas estadísticas y matemáticas.
+	\section{One-Hot Encoding (OHE)}
+	
+		El \textit{One-Hot Encoding} es la técnica de transformación mas extendida para el tratamiento de variables categóricas nominales. Su principio se basa en la eliminación de cualquier relación de orden mediante la binarización de los niveles de cada atributo.
+	
+	\subsection{Definición Formal}
+
+		Matemáticamente, el \textit{One-Hot Encoding} puede definirse como una función de mapeo $\phi$ que proyecta un nivel categórico en un espacio vectorial binario de dimensión $k$, donde $k$ es la cardinalidad del atributo (número de niveles únicos).
 		
-		\subsection{El concepto de representación numérica en modelos matemáticos}
+		Sea $\mathcal{C} = \{c_1, c_2, \dots, c_k\}$ el conjunto de todos los niveles posibles de una variable categórica. La función $\phi: \mathcal{C} \rightarrow \{0, 1\}^k$ asigna a cada categoría $c_i$ un vector canónico $\mathbf{e}_i \in \mathbb{R}^k$:
 		
-			La mayoría de los algoritmos de Aprendizaje Automático, incluyendo las Redes Neuronales, la Regresión Logística y las Maquinas de Soporte Vectorial (SVM), son funciones matemáticas que operan exclusivamente sobre \textbf{tensores numéricos}. En estas estructuras, cada atributo de entrada debe ser una magnitud escalar que permita realizar operaciones de álgebra lineal, como el calculo de productos punto, o de calculo diferencial, como la actualización de pesos mediante la gradiente descendente.
-			En este contexto, las etiquetas de texto como \texttt{'Private'} (perteneciente a la variable \textit{workclass}) o \texttt{'China'} (de \textit{native-country}) carecen de valor operativo directo para los cálculos internos del algoritmo. Por lo tanto, se debe establecer una función de transformación $\phi: \mathcal{C} \rightarrow \mathbb{R}^n$ que proyecte el espacio de categorías cualitativas en un espacio vectorial numérico. Esta representación vectorial permite que tanto los modelos de Aprendizaje Automático como los de Aprendizaje Profundo puedan procesar y extraer patrones de la información demográfica y laboral del censo.
+		\begin{equation}
+			\phi(c_i) = \mathbf{e}_i = (0, \dots, 0, \underbrace{1}_{i\text{-ésima pos.}}, 0, \dots, 0)
+		\end{equation}
+		
+		De esta manera, para cualquier instancia del conjunto de datos que pertenezca a la categoría $c_i$, la representación resultante es un vector de longitud $k$ donde todas sus componentes son nulas, a excepción de la posición $i$, que toma el valor unitario. Esta propiedad garantiza que todos los vectores resultantes sean ortogonales entre sí, asegurando que el modelo no interprete cercanías o jerarquías espaciales erróneas entre etiquetas nominales.
+		
+	\subsection{Implementación e Impacto en la Dimensionalidad}
+
+		En este trabajo, se implementó la función de OHE sobre las 8 variables categóricas del \textit{dataset}. La aplicación de esta técnica generó una \textbf{explosión de dimensionalidad}, un fenómeno crítico en el preprocesamiento de datos de alta cardinalidad.
+		
+		El \textit{dataset} original, que contaba con 14 atributos predictivos, se expandió a un total de \textbf{106 columnas} tras la codificación. El tamaño final del espacio de características $D_{final}$ tras el proceso de binarización puede calcularse como:
+		
+		\begin{equation}
+			D_{final} = D_{num} + \sum_{j=1}^{N} k_j
+		\end{equation}
+		
+		Donde $D_{num}$ representa las variables numéricas originales y $k_j$ la cardinalidad de la $j$-ésima variable categórica. En nuestro caso, este incremento exponencial se atribuye principalmente a variables como \textit{native-country} ($k=41$) y \textit{occupation} ($k=14$). Como resultado, se obtiene una matriz de diseño altamente dispersa (\textit{sparse matrix}), lo cual aumenta los requerimientos de memoria y la complejidad computacional para los algoritmos de aprendizaje posteriores.
+			
+	
+
+	
+	
+	
+
 		
 	
 
