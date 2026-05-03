@@ -189,65 +189,97 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 	
 		El \textit{dataset} consta con 14 atributos predictivos que capturan información demográfica y laboral. En la Tabla \ref{tab:atributos} se presenta el diccionario de datos detallados:
 		
-	\begin{table}[H]
-		\centering
-		\begin{adjustbox}{width=\textwidth}
-			\begin{tabular}{@{}llll@{}}
-				\toprule
-				\textbf{Atributo} & \textbf{Tipo de Dato} & \textbf{Descripción} & \textbf{Dominio / Cardinalidad} \\ \midrule
-				Age & Numérico (Int) & Edad de los individuos. & Rango: 17 a 90 años. \\
-				Workclass & Categórico & Sector de empleo. & 9 categorías. \\
-				Fnlwgt & Numérico (Int) & Peso muestral de la población. & Rango: 12,285 a 1,490,400. \\
-				Education & Categórico & Nivel de estudios alcanzado. & 16 categorías. \\
-				Educational-num & Numérico (Int) & Nivel educativo escalar. & Rango: 1 a 16. \\
-				Marital-status & Categórico & Estado civil. & 7 categorías. \\
-				Occupation & Categórico & Especialidad laboral. & 15 categorías. \\
-				Relationship & Categórico & Rol dentro del núcleo familiar. & 6 categorías. \\
-				Race & Categórico & Origen étnico. & 5 categorías. \\
-				Gender & Categórico & Género biológico. & 2 categorías. \\
-				Capital-gain & Numérico (Int) & Utilidades financieras. & Rango: 0 a 99,999. \\
-				Capital-loss & Numérico (Int) & Pérdidas financieras. & Rango: 0 a 4,356. \\
-				Hours-per-week & Numérico (Int) & Carga horaria semanal. & Rango: 1 a 99 horas. \\
-				Native-country & Categórico & País de procedencia. & 42 categorías. \\
-				\rowcolor{TNcolor}
-				\textbf{Income (Target)} & \textbf{Categórico} & \textbf{Variable objetivo.} & \textbf{2 niveles (0 y 1).} \\ \bottomrule
-			\end{tabular}
-		\end{adjustbox}
-		\caption{Diccionario de datos: tipos, descripciones y análisis de dominios.}
-		\label{tab:atributos}
-	\end{table}
+		\begin{table}[H]
+			\centering
+			\begin{adjustbox}{width=\textwidth}
+				\begin{tabular}{@{}llll@{}}
+					\toprule
+					\textbf{Atributo} & \textbf{Tipo de Dato} & \textbf{Descripción} & \textbf{Dominio / Cardinalidad} \\ \midrule
+					Age & Numérico (Int) & Edad de los individuos. & Rango: 17 a 90 años. \\
+					Workclass & Categórico & Sector de empleo. & 9 categorías. \\
+					Fnlwgt & Numérico (Int) & Peso muestral de la población. & Rango: 12,285 a 1,490,400. \\
+					Education & Categórico & Nivel de estudios alcanzado. & 16 categorías. \\
+					Educational-num & Numérico (Int) & Nivel educativo escalar. & Rango: 1 a 16. \\
+					Marital-status & Categórico & Estado civil. & 7 categorías. \\
+					Occupation & Categórico & Especialidad laboral. & 15 categorías. \\
+					Relationship & Categórico & Rol dentro del núcleo familiar. & 6 categorías. \\
+					Race & Categórico & Origen étnico. & 5 categorías. \\
+					Gender & Categórico & Género biológico. & 2 categorías. \\
+					Capital-gain & Numérico (Int) & Utilidades financieras. & Rango: 0 a 99,999. \\
+					Capital-loss & Numérico (Int) & Pérdidas financieras. & Rango: 0 a 4,356. \\
+					Hours-per-week & Numérico (Int) & Carga horaria semanal. & Rango: 1 a 99 horas. \\
+					Native-country & Categórico & País de procedencia. & 42 categorías. \\
+					\rowcolor{TNcolor}
+					\textbf{Income (Target)} & \textbf{Categórico} & \textbf{Variable objetivo.} & \textbf{2 niveles (0 y 1).} \\ \bottomrule
+				\end{tabular}
+			\end{adjustbox}
+			\caption{Diccionario de datos: tipos, descripciones y análisis de dominios.}
+			\label{tab:atributos}
+		\end{table}
 	
 	\subsection{Análisis de Calidad y Limpieza de Datos}
+	
+		Previo a la aplicación de las técnicas de \textit{encoding}, se procede a realizar la limpieza de los datos. El \textit{Adult Income Dataset} contiene ruidos e inconsistencias (valores '?' y duplicados) que deben tratarse para asegurar la robustez de los modelos.
+	
+	\subsubsection{Identificación y Cuantificación de los Valores faltantes}
+	
+		Durante la exploración inicial, se identificó que el conjunto de datos emplea el carácter especial \texttt{'?'} para representar información desconocida. Mediante un análisis de frecuencias, se determinó que el impacto de estos valores se concentra exclusivamente en tres variables categóricas, como se detalla en la Tabla \ref{tab:nulos}:
 		
-		Previo a la aplicación de las técnicas de \textit{encoding}, se procede a realizar la limpieza de los datos. El \textit{Adult Income Dataset} contiene ruidos e inconsistencias (valores '?' y duplicados) que deben tratarse.
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{|l|c|c|c|}
+				\hline
+				\rowcolor{FPcolor} 
+				\textbf{Atributo} & \textbf{Cantidad de '?'} & \textbf{Porcentaje} & \textbf{Moda (Valor para imputación)} \\ \hline
+				Workclass & 2,799 & 5.73\% & Private \\ \hline
+				Occupation & 2,809 & 5.75\% & Prof-specialty \\ \hline
+				Native-country & 857 & 1.75\% & United-States \\ \hline
+			\end{tabular}
+			\caption{Distribución de valores faltantes y estrategia de imputación.}
+			\label{tab:nulos}
+		\end{table}
+	
+	\subsubsection{Impacto de la Imputación y Análisis de Distribución}
+	
+		Se optó por una \textbf{imputación por moda}, sustituyendo el carácter \texttt{'?'} por el valor más frecuente. Si bien esto preserva el tamaño de la muestra, altera la distribución original. En la Tabla \ref{tab:distribucion_cambio} se observa cómo se incrementó la concentración en las categorías dominantes:
 		
-		\subsection{Identificación y Cuantificación de los Valores faltantes}
-			
-			Durante la exploración inicial, se identifico que el conjunto de datos emplea el carácter especial \texttt{'?'} para representar información desconocida. Mediante un análisis de frecuencias, se determino que el impacto de estos valores se concentra exclusivamente en tres variables categóricas, como se detalla en la Tabla \ref{tab:nulos}:
-			
-			\begin{table}[H]
-				\centering
-				\begin{tabular}{|l|c|c|c|}
+		\begin{table}[H]
+			\centering
+			\begin{adjustbox}{width=\textwidth}
+				\begin{tabular}{|l|l|c|c|c|}
 					\hline
-					\rowcolor{FPcolor} 
-					\textbf{Atributo} & \textbf{Cantidad de '?'} & \textbf{Porcentaje} & \textbf{Moda (Valor para imputación)} \\ \hline
-					Workclass & 2,799 & 5.73\% & Private \\ \hline
-					Occupation & 2,809 & 5.75\% & Prof-specialty \\ \hline
-					Native-country & 857 & 1.75\% & United-States \\ \hline
+					\rowcolor{TNcolor} 
+					\textbf{Atributo} & \textbf{Categoría (Moda)} & \textbf{\% Original} & \textbf{\% Post-Imputación} & \textbf{Variación} \\ \hline
+					Workclass & Private & 69.41\% & 75.15\% & +5.74\% \\ \hline
+					Occupation & Prof-specialty & 12.63\% & 18.38\% & +5.75\% \\ \hline
+					Native-country & United-States & 89.74\% & 91.49\% & +1.75\% \\ \hline
 				\end{tabular}
-				\caption{Distribución de valores faltantes y estrategia de imputación.}
-				\label{tab:nulos}
-			\end{table}
+			\end{adjustbox}
+			\caption{Modificación de la concentración de la moda tras la limpieza.}
+			\label{tab:distribucion_cambio}
+		\end{table}
+		
+		\textbf{Riesgos Identificados:} Esta técnica acentúa el sesgo hacia las clases mayoritarias. En el caso de \textit{Occupation}, la moda creció casi un 50\% respecto a su valor original, lo que podría introducir correlaciones artificiales que los modelos de \textit{Machine Learning} podrían sobreajustar (\textit{overfitting}).
+		
+
+		\subsubsection{Eliminación de Registros Duplicados} 
+			Se detectaron y eliminaron \textbf{52 registros duplicados}, resultado en un \textit{dataset} final de \textbf{48.790 registros}.
+		
+		\subsubsection{Consolidación del Dataset} 
+			Tras el procesamiento, se realizo un reajuste del indice y se verifico la consistencia de los tipos de datos: variables numéricas (\textit{int64}) y categóricas (\textit{str}). Los datos limpios se exportaron al archivo  \texttt{adult\_limpio.csv} para asegurar que todos los experimentos de \textit{encoding} partan de la misma base de información.
+		
+		\subsection{El desafió de la naturaleza de los datos y el riesgo del sesgo}
+			Una solución trivial seria el \textit{Label Encoding}, que asigna un numero entero arbitrario a cada categoría. No obstante, para atributos nominales como \textit{occupation} o \textit{native-country}, esta técnica introduce un \textbf{sesgo de orden natural inexistente}.
+			Si se utilizara una codificación entera simple, un modelo de ML (especialmente aquellos basados en distancias o pesos) interpretaría erróneamente que una categoria con valor 3 es "superior" o "mas distante" a una con valor 1. Este orden artificial distorsiona la realidad de los datos nominales y puede degradar significativamente la precisión de los modelos.
 			
-		\subsection{Estrategias de Depuración Implementadas}
-			
-			Para garantizar la integridad de los datos, se realizaron las siguientes acciones de depuración e imputación:
-			
-			\begin{enumerate}
-				\item  \textbf{Imputación por Moda:} En lugar de descartar registros, se opto por sustituir el caracter \texttt{'?'} por el valor mas frecuente de cada columna. Gracias a esto preservamos el tamaño de la muestra original.
-				\item \textbf{Eliminación de Registros Duplicados:} Se detectaron y eliminaron \textbf{52 registros duplicados}, resultado en un \textit{dataset} final de \textbf{48.789 registros}.
-				\item \textbf{Consolidación del Dataset:} Tras el procesamiento, se realizo un reajuste del indice y se verifico la consistencia de los tipos de datos: variables numéricas (\textit{int64}) y categóricas (\textit{str}). Los datos limpios se exportaron al archivo  \texttt{adult\_limpio.csv} para asegurar que todos los experimentos de \textit{encoding} partan de la misma base de información.
-			\end{enumerate}
+		\subsection{Algoritmos con soporte categórico nativo vs Transformación}
+			Es importante destacar que existen algoritmos basados en arboles de decision (como \textit{Random Forest}) o \textit{XGBoost}) que pueden manejar atributos categoricos mediante logicas en sus nodos. Sin embargo, para realizar un estudio comparativo, o para utilizar arquitecturas de DL, se debe realizar una estandarizacion mediante tecnicas de \textit{encoding}.
+	
+		
+		
+	
+		
+	
 			
 					
 		
@@ -255,8 +287,21 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 
 
 
-\chapter{Metodología}
-\label{Sec:Métodos}
+\chapter{Metodología de Codificación Categórica}
+\label{ch:metodologia}
+	
+	En este capitulo se describen las técnicas de transformación de datos implementadas para convertir las variables cualitativas del \textit{Adult Income Dataset} en representaciones numéricas. Este proceso es fundamental para permitir la comparación de rendimiento entre diversos algoritmos de Aprendizaje Automático. 
+	
+	\section{Necesidad del Preprocesamiento de Datos Categóricos}
+		
+		El éxito de los modelos de \textit{Machine Learning} (ML) y \textit{Deep Learning} (DL) reside en su capacidad para identificar patrones mediante herramientas estadísticas y matemáticas.
+		
+		\subsection{El concepto de representación numérica en modelos matemáticos}
+		
+			La mayoría de los algoritmos de Aprendizaje Automático, incluyendo las Redes Neuronales, la Regresión Logística y las Maquinas de Soporte Vectorial (SVM), son funciones matemáticas que operan exclusivamente sobre \textbf{tensores numéricos}. En estas estructuras, cada atributo de entrada debe ser una magnitud escalar que permita realizar operaciones de álgebra lineal, como el calculo de productos punto, o de calculo diferencial, como la actualización de pesos mediante la gradiente descendente.
+			En este contexto, las etiquetas de texto como \texttt{'Private'} (perteneciente a la variable \textit{workclass}) o \texttt{'China'} (de \textit{native-country}) carecen de valor operativo directo para los cálculos internos del algoritmo. Por lo tanto, se debe establecer una función de transformación $\phi: \mathcal{C} \rightarrow \mathbb{R}^n$ que proyecte el espacio de categorías cualitativas en un espacio vectorial numérico. Esta representación vectorial permite que tanto los modelos de Aprendizaje Automático como los de Aprendizaje Profundo puedan procesar y extraer patrones de la información demográfica y laboral del censo.
+		
+	
 
 
 \chapter{Resultados y discusión}
