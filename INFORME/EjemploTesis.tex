@@ -291,11 +291,11 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 	\subsection{Algoritmos con soporte categórico nativo vs Transformación}
 	
 		Es importante destacar que existen algoritmos basados en arboles de decisión (como \textit{Random Forest}) o \textit{XGBoost}) que pueden manejar atributos categóricos mediante lógicas en sus nodos. Sin embargo, para realizar un estudio comparativo, o para utilizar arquitecturas de DL, se debe realizar una estandarización mediante técnicas de \textit{encoding}.
-		Este trabajo explora tres enfoques distintos para resolver este desafio: \textit{One-Hot Encoding}, \textit{Count Encoding} y \textit{Hashing Encoding}.
+		Este trabajo explora tres enfoques distintos para resolver este desafió: \textit{One-Hot Encoding}, \textit{Count Encoding} y \textit{Hashing Encoding}.
 		
 	\section{One-Hot Encoding (OHE)}
 	
-		El \textit{One-Hot Encoding} es la técnica de transformación mas extendida para el tratamiento de variables categóricas nominales. Su principio se basa en la eliminación de cualquier relación de orden mediante la binarización de los niveles de cada atributo.
+		El \textit{One-Hot Encoding} es una de las técnicas de transformación mas utilizadas para el tratamiento de variables categóricas nominales, debido a su sencillez y compatibilidad con la mayoría de los algoritmos de aprendizaje automático. Su principio se basa en la eliminación de cualquier relación de orden mediante la binarización de los niveles de cada atributo.
 	
 	\subsection{Definición Formal}
 
@@ -311,7 +311,7 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 		
 	\subsection{Implementación e Impacto en la Dimensionalidad}
 
-		En este trabajo, se implementó la función de OHE sobre las 8 variables categóricas del \textit{dataset}. La aplicación de esta técnica generó una \textbf{explosión de dimensionalidad}, un fenómeno crítico en el preprocesamiento de datos de alta cardinalidad.
+		En este trabajo, se implementó la función de OHE sobre las 8 variables categóricas del \textit{dataset}. La aplicación de esta técnica generó una \textbf{explosión de dimensionalidad}.
 		
 		El \textit{dataset} original, que contaba con 14 atributos predictivos, se expandió a un total de \textbf{106 columnas} tras la codificación. El tamaño final del espacio de características $D_{final}$ tras el proceso de binarización puede calcularse como:
 		
@@ -320,6 +320,38 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 		\end{equation}
 		
 		Donde $D_{num}$ representa las variables numéricas originales y $k_j$ la cardinalidad de la $j$-ésima variable categórica. En nuestro caso, este incremento exponencial se atribuye principalmente a variables como \textit{native-country} ($k=41$) y \textit{occupation} ($k=14$). Como resultado, se obtiene una matriz de diseño altamente dispersa (\textit{sparse matrix}), lo cual aumenta los requerimientos de memoria y la complejidad computacional para los algoritmos de aprendizaje posteriores.
+		
+	\section{Count Encoding}
+		
+		El \textit{Count Encoding} es una técnica de transformación que captura la importancia estadística de cada categoría dentro del conjunto de datos. A diferencia del OHE, este método no expande el espacio de características, manteniendo una correspondencia de 1:1 entre las variables originales y las transformadas.
+		
+		\subsection{Mecánica de Transformación y Definición Formal}
+			
+			La técnica consiste en reemplazar cada etiqueta categórica por el numero total de apariciones (frecuencia absoluta) de dicha etiqueta en el \textit{dataset}.
+			Sea $X$ un atributo categórico y $\mathcal{C} = \{c_1, c_2 \dots, c_k\}$ el conjunto de sus niveles. Definimos la función de transformación $T$ como: 
+			
+			\begin{equation}
+				T(c_i) = \sum_{j=1}^{m} \mathbb{I}(x_j = c_i)
+			\end{equation}
+			
+			Donde $m$ es el numero total de registros e $\mathbb{I}$ es la función indicatriz que toma el valor 1 si el registro $x_j$ coincide con la categoría $c_i$, y 0 en caso contrario.
+		
+		\subsection{Frecuencia Relativa Normalizada}
+			
+			Se implemento una variante de \textbf{Count Encoding Normalizado}, la cual consiste en una función de transformación $T_{norm}$ que se define como la probabilidad empírica de la categoría:
+			
+			\begin{equation}
+				T_{norm}(c_i) = \frac{\sum_{j=1}^{m} \mathbb{I}(x_j = c_i)}{m}
+			\end{equation}
+			
+			Donde $m$ es el tamaño total del \textit{dataset}. El resultado es un espacio de características donde cada valor esta acotado en el intervalo $[0, 1]$.
+		
+		\subsection{Implementación y e Impacto en el Dataset}
+			
+			El impacto principal de esta técnica en el \textit{Adult Income Dataset} fue la \textbf{preservación de la dimensionalidad origina}l. Tras la transformación, el dataset mantuvo sus \textbf{14 atributos predictivos}.
+			
+			
+			
 			
 	
 
