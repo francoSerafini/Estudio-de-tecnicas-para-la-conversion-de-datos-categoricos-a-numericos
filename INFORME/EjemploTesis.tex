@@ -349,8 +349,110 @@ escapeinside={\%*}{*)}          % if you want to add a comment within your code
 		\subsection{Implementación y e Impacto en el Dataset}
 			
 			El impacto principal de esta técnica en el \textit{Adult Income Dataset} fue la \textbf{preservación de la dimensionalidad origina}l. Tras la transformación, el dataset mantuvo sus \textbf{14 atributos predictivos}.
+
+
+	\section{Hashing Encoding}
+		
+		El \textit{Hashing Encoding} es una técnica de transformacion que utiliza funciones de dispersión (\textit{hashing}) para mapear niveles categóricos en un espacio vectorial de dimensión fija y predefinida. A diferencia del \textit{One-Hot Encoding}, el número de columnas resultantes no depende de la cardinalidad de los atributos, sino de un hiperparámetro que permite controlar directamente la dimensionalidad del espacio de características resultantes.
+	
+		\subsection{Definición Formal y Proceso de Hash (MurmurHash3)}
+		
+		El \textit{Hashing Encoding} transforma un nivel categórico $c$ en un espacio vectorial de dimensión $n$ mediante una función de dispersión compuesta. El proceso se divide en tres etapas matemáticas: la generación del valor de hash, la mezcla de bits (\textit{mixing}) y la proyección al espacio de características.
+		
+		\subsubsection{Algoritmo de Dispersión}
+		
+		En este trabajo se utiliza el algoritmo \textbf{MurmurHash3}, una función de hash no criptográfica que destaca por su baja tasa de colisión. Dado un nivel categórico $c$ (tratado como una secuencia de bytes), el proceso para obtener el valor entero $h(c)$ se define mediante las siguientes transformaciones iterativas:
+		
+		1. \textbf{Inicialización:} Se define un valor inicial o \textit{seed} ($s$) y constantes de mezcla $c_1 = \text{0xcc9e2d51}$, $c_2 = \text{0x1b873593}$.
+		2. \textbf{Procesamiento por bloques:} Para cada bloque de datos $k$ de la cadena, se aplican rotaciones y multiplicaciones:
+		\begin{equation}
+			\begin{cases}
+				k \leftarrow k \cdot c_1 \\
+				k \leftarrow (k \ll 15) \mid (k \gg 17) \text{ (Rotación a la izquierda)} \\
+				k \leftarrow k \cdot c_2 \\
+				h \leftarrow h \oplus k \\
+				h \leftarrow (h \ll 13) \mid (h \gg 19) \\
+				h \leftarrow h \cdot 5 + \text{0xe6546b64}
+			\end{cases}
+		\end{equation}
+		3. \textbf{Finalización (Avalanche):} Para asegurar que cambios mínimos en la entrada generen cambios drásticos en la salida, se aplica una función de mezcla final (\textit{finalizer}):
+		\begin{equation}
+			\begin{aligned}
+				h &\leftarrow h \oplus (\text{longitud de } c) \\
+				h &\leftarrow h \oplus (h \gg 16) \cdot \text{0x85ebca6b} \\
+				h &\leftarrow h \oplus (h \gg 13) \cdot \text{0xc2b2ae35} \\
+				h &\leftarrow h \oplus (h \gg 16)
+			\end{aligned}
+		\end{equation}
+		
+		
+		
+		\subsubsection{Proyección al Espacio de Características}
+		
+		Una vez obtenido el valor entero $h(c)$, la transformación final $\mathcal{H}(c)$ hacia el vector de características de dimensión $n$ (donde $n \in \{8, 16, 32\}$ en nuestro experimento) se realiza mediante la operación módulo:
+		
+		\begin{equation}
+			\mathcal{H}(c) = |h(c)| \pmod n
+		\end{equation}
+		
+		Finalmente, el vector resultante $\mathbf{V} \in \{0, 1\}^n$ activa la posición correspondiente:
+		
+		\begin{equation}
+			\mathbf{V}_i = \begin{cases} 1 & \text{si } \mathcal{H}(c) = i \\ 0 & \text{en otro caso} \end{cases}
+		\end{equation}
+		
+		Este proceso garantiza que cualquier entrada de texto, sin importar su longitud o complejidad, sea mapeada a una de las $n$ dimensiones de forma pseudoaleatoria y uniforme, permitiendo la reducción de las 106 columnas originales a los espacios de 15, 23 o 39 columnas analizados en este estudio.
+	
+	
+		\subsection{Implementación Experimental e Impacto en la Dimensionalidad}
+		
+			Se evaluó el impacto de esta técnica sobre las 8 variables categóricas del \textit{Adult Income Dataset} mediante tres configuraciones de dimensionalidad fija. El uso de \textit{Hashing Encoding} permitió mitigar drásticamente la explosión de dimensionalidad observada con el método OHE (106 columnas), permitiendo un control preciso sobre el ancho de la matriz de entrada.
 			
+			Para el desarrollo experimental, se generaron tres versiones del conjunto de datos, cuya estructura final se detalla a continuación:
 			
+			\begin{enumerate}
+				\item \textbf{Configuración de 8 componentes:} El \textit{dataset} se redujo a un total de \textbf{15 columnas}. Esta versión representa la compresión más agresiva, orientada a minimizar el costo computacional.
+				\item \textbf{Configuración de 16 componentes:} El \textit{dataset} resultó en un total de \textbf{23 columnas}. Esta configuración busca un equilibrio entre la reducción de dimensiones y la preservación de la varianza de los datos.
+				\item \textbf{Configuración de 32 componentes:} El \textit{dataset} final cuenta con \textbf{39 columnas}. Esta variante ofrece el mayor espacio para la función de hash, reduciendo significativamente la probabilidad de colisiones.
+			\end{enumerate}
+			
+			Independientemente del número de componentes de hash seleccionados, la estructura interna de cada \textit{dataset} mantiene la integridad de los datos originales, componiéndose de:
+			\begin{itemize}
+				\item $n$ columnas generadas por la función de hash (denominadas de \texttt{col\_0} a \texttt{col\_n-1}).
+				\item 6 atributos numéricos originales (\textit{age, fnlwgt, educational-num, capital-gain, capital-loss, hours-per-week}).
+				\item 1 variable objetivo binaria (\textit{income}).
+			\end{itemize}
+			
+		\subsection{Análisis de Riesgos: El Fenómeno de la Colisión}
+			
+			A pesar de sus beneficios en términos de eficiencia, el \textit{Hashing Encoding} introduce un riesgo estadístico denominado \textbf{colisión de hash}. Una colisión ocurre cuando dos niveles categóricos distintos ($c_1 \neq c_2$) producen el mismo índice de salida:
+			
+			\begin{equation}
+				h(c_1) \equiv h(c_2) \pmod n
+			\end{equation}
+			
+			En este escenario, el modelo pierde la capacidad de distinguir entre ambas categorías, lo que equivale a introducir ruido en los datos.
+
+	\section{Análisis Comparativo de las Técnicas de Codificación}
+
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{|l|c|c|c|}
+				\hline
+				\rowcolor{lightgray} 
+				\textbf{Técnica} & \textbf{Columnas Finales} & \textbf{Tipo de Dato} & \textbf{Riesgo Principal} \\ \hline
+				Dataset Original & 14 & Mixto & No procesable \\ \hline
+				One-Hot Encoding & 106 & Binario & Explosión dimensional \\ \hline
+				Count Encoding & 14 & Numérico & Colisión de frecuencias \\ \hline
+				Hash-8 & 15 & Binario/Hash & Colisión alta \\ \hline
+				Hash-16 & 23 & Binario/Hash & Colisión moderada \\ \hline
+				Hash-32 & 39 & Binario/Hash & Colisión baja \\ \hline
+			\end{tabular}
+			\caption{Comparativa del impacto de las técnicas de encoding en la dimensionalidad del dataset Adult Income.}
+			\label{tab:resumen_encoding}
+		\end{table}
+				
+
 			
 			
 	
